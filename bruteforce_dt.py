@@ -7,34 +7,45 @@ Currently supports Windows FILETIME
 usage: ./bruteforce_dt.py <filename> <year to search in format 'YYYY'>
 '''
 
-__version__ = '0.1'
+__version__ = '0.2'
 
 import struct
 import os
 from datetime import datetime, timedelta
 import sys
+import argparse
 
-def bruteforce_datetime():
-    # Basic data validation of YYYY between 1601 and 2042
-    while True:
-        try:
-            date_setting = int(sys.argv[2])
-        except ValueError:
-            print('Error: check your command-line parameters. Should be ./bruteforce_dt.py <filename> YYYY')
-            sys.exit()
+# Process commandline arguments
+parser = argparse.ArgumentParser()
+parser.add_argument(dest='file', help='Target Filename')
+parser.add_argument(dest='year', help='year to search, format YYYY')
+args = parser.parse_args()
+file = args.file
+if os.path.exists(file) == False:
+    print('{} not found'.format(file))
+    sys.exit()
+year = args.year
+# Basic data validation of YYYY between 1601 and 2042
+while True:
+    try:
+        year = int(year)
+    except ValueError:
+        print('Error: check your command-line parameters. Should be ./bruteforce_dt.py <filename> YYYY')
+        sys.exit()
+    else:
+        if year >= 1601 and year <= 2042:
+            break
         else:
-            if date_setting >= 1601 and date_setting <= 2042:
-                break
-            else:
-                print('Error: YYYY should be between 1601 and 2042')
-                sys.exit()
+            print('Error: YYYY should be between 1601 and 2042')
+            sys.exit()
 
+def bruteforce_datetime(file, year):
     # open file, unpack 8 bytes starting from offset 0. Check if valid date and increment
-    with open(sys.argv[1], 'rb') as file_open:
+    with open(file, 'rb') as file_open:
         filecontent = file_open.read()
         offset = 0
         date_dic = {}
-        file_size = os.path.getsize(sys.argv[1])
+        file_size = os.path.getsize(file)
         while offset <= (file_size - 8):
             possible_filetime = struct.unpack("<Q",filecontent[offset:(offset + 8)])[0]
             try:
@@ -42,22 +53,19 @@ def bruteforce_datetime():
             except:
                 pass
             iso_date = (str(iso_datetime))[0:19]
-            if iso_date[0:4] == str(date_setting):
+            if iso_date[0:4] == str(year):
                 date_dic[offset] = iso_date # use dictionary of offset: date
             offset += 1
         if bool(date_dic) == False:
-            print('There were no identified records matching the year {}'.format(date_setting))
+            print('There were no identified records matching the year {}'.format(year))
         else:
-            print('Windows little-endian FILETIME records (in UTC) matching the year {} as follows:'.format(date_setting))
+            print('Windows little-endian FILETIME records (in UTC) matching the year {} as follows:'.format(year))
             for key, value in sorted(date_dic.items()):
                 print('Offset: {:#x}\tDate: {}'.format(key, value))
 
 def main():
     print('bruteforce_dt.py: Test binary data for possible valid date/time formats. Version {}\n'.format(__version__))
-    if len(sys.argv) != 3:
-        print('Syntax: bruteforce_dt.py <FILENAME> <YYYY>')
-        sys.exit()
-    bruteforce_datetime()
+    bruteforce_datetime(file, year)
 
 if __name__== "__main__":
     main()
