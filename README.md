@@ -1,6 +1,6 @@
 # bruteforce_dt
 
-script to brute-force binary data looking for valid dates and times.
+Script to brute-force binary data looking for valid dates and times. See https://bitofhex.com/2018/07/29/brute-force-dates-times/ for background
 
 Currently supports Windows FILETIME
 
