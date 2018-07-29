@@ -26,3 +26,6 @@ Offset: 0x93    Date: 2018-03-07 08:43:03
 
 NB: All records presented in UTC
 
+## TODO
+- Add more date/time types (e.g. Unix epoch)
+- Add date range capability
