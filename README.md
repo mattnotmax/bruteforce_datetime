@@ -1,10 +1,10 @@
-# bruteforce_datetime
+# bruteforce_dt
 
 script to brute-force binary data looking for valid dates and times.
 
 Currently supports Windows FILETIME
 
-usage: ./brutus.py <filename> <year to search in format 'YYYY'>
+usage: ./bruteforce_dt.py <filename> <year to search in format 'YYYY'>
   
 Requirements: Python 3.x
 
